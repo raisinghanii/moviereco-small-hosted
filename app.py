@@ -4,22 +4,13 @@ import numpy as np
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
-app = Flask(__name__)
 
-def get_title_from_index(index):
+def get_title_from_index(df,index):
     return df[df.index == index]["title"].values[0]
 
 
-def get_index_from_title(title):
+def get_index_from_title(df,title):
     return df[df.title == title]["index"].values[0]
-
-
-df = pd.read_csv("C:/Users/Yogesh/PycharmProjects/untitled1/dataset.csv")
-
-features = ['keywords', 'cast', 'genres', 'director']
-
-for feature in features:
-    df[feature] = df[feature].fillna('')
 
 
 def combine_features(row):
@@ -29,21 +20,34 @@ def combine_features(row):
         print("Error:", row)
 
 
-x = df.apply(combine_features, axis=1)
+def calcsim():
+    df = pd.read_csv("C:/Users/Yogesh/PycharmProjects/untitled1/dataset.csv")
+    features = ['keywords', 'cast', 'genres', 'director']
 
-cv = CountVectorizer()
+    for feature in features:
+        df[feature] = df[feature].fillna('')
 
-count_matrix = cv.fit_transform(x)
+    x = df.apply(combine_features, axis=1)
 
-cosine_sim = cosine_similarity(count_matrix)
+    cv = CountVectorizer()
 
+    count_matrix = cv.fit_transform(x)
 
-# print("Model Created....")
+    cosine_sim = cosine_similarity(count_matrix)
+
+    return df,cosine_sim
+
 
 
 def suggest(movie_user_likes):
+    try:
+        df.head()
+        cosine_sim.shape
+    except:
+        df,cosine_sim = calcsim()
 
-    movie_index = get_index_from_title(movie_user_likes)
+
+    movie_index = get_index_from_title(df,movie_user_likes)
 
     similar_movies = list(enumerate(cosine_sim[movie_index]))
 
@@ -53,51 +57,30 @@ def suggest(movie_user_likes):
 
     i = 0
     for element in sorted_similar_movies:
-        #print(get_title_from_index(element[0]))
-        movies.append(get_title_from_index(element[0]))
+        # print(get_title_from_index(element[0]))
+        movies.append(get_title_from_index(df,element[0]))
         i = i + 1
         if i > 50:
             break
 
     return movies
 
+
 def Convert(lst):
     it = iter(lst)
     res_dct = dict(zip(it, it))
     return res_dct
+
+
 app = Flask(__name__)
 
-# @app.route('/success/<name>')
-# def success(name):
-#     try:
-#         list = []
-#         res = suggest(name)
-#         for i in res:
-#             list.append(i)
-#
-#         return ("<p>" + "</p><p>".join(list) + "</p>")
-#     except:
-#         return "Movie not found"
-#
-# # @app.route('/login',methods = ['POST', 'GET'])
-# # def login():
-# #      return render_template('C:/Users/Yogesh/PycharmProjects/untitled1/index.html')
-# #      # if request.method == 'POST':
-# #      #     user = request.form['nm']
-# #      #     return redirect(url_for('success',name = user))
-# #      # else:
-# #      #     user = request.args.get('nm')
-# #      #     return redirect(url_for('success',name = user))
-#
-# @app.route('/')
-# def home():
-#     return render_template('index.html')
 
 @app.route('/')
 def home():
     return render_template('index.html')
 
-@app.route('/predict',methods=['POST'])
+
+@app.route('/predict', methods=['POST'])
 def predict():
     '''
     For rendering results on HTML GUI
