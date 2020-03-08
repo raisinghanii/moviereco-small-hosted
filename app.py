@@ -1,9 +1,9 @@
-from flask import Flask, redirect, url_for, request, render_template
+from flask import Flask, request, render_template
 import pandas as pd
 import numpy as np
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-
+from fuzzywuzzy import fuzz
 
 def get_title_from_index(df,index):
     return df[df.index == index]["title"].values[0]
@@ -22,6 +22,7 @@ def combine_features(row):
 
 def calcsim():
     df = pd.read_csv("dataset.csv")
+
     features = ['keywords', 'cast', 'genres', 'director']
 
     for feature in features:
@@ -39,6 +40,22 @@ def calcsim():
 
 
 
+def fuzzy_matching(mapper, fav_movie, verbose=True):
+
+    match_tuple = []
+
+    for i in mapper:
+        ratio = fuzz.ratio(i.lower(),fav_movie.lower())
+        if ratio>=60:
+            match_tuple.append((i,ratio))
+
+    match_tuple = sorted(match_tuple, key=lambda x: x[1])[::-1]
+    if not match_tuple:
+        return "00"
+    if verbose:
+    return match_tuple[0][0]
+
+
 def suggest(movie_user_likes):
     try:
         df.head()
@@ -47,7 +64,10 @@ def suggest(movie_user_likes):
         df,cosine_sim = calcsim()
 
 
-    movie_index = get_index_from_title(df,movie_user_likes)
+    movie_user_like = fuzzy_matching(df['title'],movie_user_likes)
+    print("movie likes = ",movie_user_like)
+
+    movie_index = get_index_from_title(df,movie_user_like)
 
     similar_movies = list(enumerate(cosine_sim[movie_index]))
 
@@ -65,11 +85,6 @@ def suggest(movie_user_likes):
 
     return movies
 
-
-def Convert(lst):
-    it = iter(lst)
-    res_dct = dict(zip(it, it))
-    return res_dct
 
 
 app = Flask(__name__)
