@@ -38,7 +38,7 @@ count_matrix = cv.fit_transform(x)
 cosine_sim = cosine_similarity(count_matrix)
 
 
-print("Model Created....")
+# print("Model Created....")
 
 
 def suggest(movie_user_likes):
