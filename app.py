@@ -21,7 +21,7 @@ def combine_features(row):
 
 
 def calcsim():
-    df = pd.read_csv("C:/Users/Yogesh/PycharmProjects/untitled1/dataset.csv")
+    df = pd.read_csv("dataset.csv")
     features = ['keywords', 'cast', 'genres', 'director']
 
     for feature in features:
