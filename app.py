@@ -53,7 +53,7 @@ def fuzzy_matching(mapper, fav_movie, verbose=True):
     if not match_tuple:
         return "00"
     if verbose:
-    return match_tuple[0][0]
+        return match_tuple[0][0]
 
 
 def suggest(movie_user_likes):
