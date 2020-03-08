@@ -40,20 +40,20 @@ def calcsim():
 
 
 
-def fuzzy_matching(mapper, fav_movie, verbose=True):
+# def fuzzy_matching(mapper, fav_movie, verbose=True):
 
-    match_tuple = []
+#     match_tuple = []
 
-    for i in mapper:
-        ratio = fuzz.ratio(i.lower(),fav_movie.lower())
-        if ratio>=60:
-            match_tuple.append((i,ratio))
+#     for i in mapper:
+#         ratio = fuzz.ratio(i.lower(),fav_movie.lower())
+#         if ratio>=60:
+#             match_tuple.append((i,ratio))
 
-    match_tuple = sorted(match_tuple, key=lambda x: x[1])[::-1]
-    if not match_tuple:
-        return "00"
-    if verbose:
-        return match_tuple[0][0]
+#     match_tuple = sorted(match_tuple, key=lambda x: x[1])[::-1]
+#     if not match_tuple:
+#         return "00"
+#     if verbose:
+#         return match_tuple[0][0]
 
 
 def suggest(movie_user_likes):
@@ -64,10 +64,10 @@ def suggest(movie_user_likes):
         df,cosine_sim = calcsim()
 
 
-    movie_user_like = fuzzy_matching(df['title'],movie_user_likes)
-    print("movie likes = ",movie_user_like)
+#     movie_user_like = fuzzy_matching(df['title'],movie_user_likes)
+#     print("movie likes = ",movie_user_like)
 
-    movie_index = get_index_from_title(df,movie_user_like)
+    movie_index = get_index_from_title(df,movie_user_likes)
 
     similar_movies = list(enumerate(cosine_sim[movie_index]))
 
